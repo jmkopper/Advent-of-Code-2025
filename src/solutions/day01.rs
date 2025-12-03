@@ -1,71 +1,53 @@
 use std::error::Error;
-use std::fs::File;
-use std::io::{self, BufRead};
+use std::fs;
 
 const DIAL_SIZE: i64 = 100;
 const START_POS: i64 = 50;
-type Spin = (i64, i64);
 
 pub fn run() -> Result<(), Box<dyn Error>> {
-    let file = File::open("puzzles/day01.txt")?;
-    let reader = io::BufReader::new(file);
-    let spins: Result<Vec<_>, _> = reader.lines().map(|line| parse_line(&line?)).collect();
-    let spins = spins?;
-    println!("Part 1: {}", part1(&spins));
-    println!("Part 2: {}", part2(&spins));
+    let input = fs::read_to_string("puzzles/day01.txt")?;
+
+    // Parse "L50" to -50, "R20" to 20
+    let spins: Vec<i64> = input
+        .lines()
+        .map(|line| {
+            let (d, n) = line.trim().split_at(1);
+            let amt = n.parse::<i64>()?;
+            Ok(if d == "L" { -amt } else { amt })
+        })
+        .collect::<Result<_, Box<dyn Error>>>()?;
+
+    let (part1, part2) = solve(&spins);
+    println!("Part 1: {}", part1);
+    println!("Part 2: {}", part2);
 
     Ok(())
 }
 
-fn parse_line(line: &str) -> Result<Spin, Box<dyn Error>> {
-    let (dir_char, num_str) = line.split_at(1);
-    let dir = match dir_char {
-        "L" => -1,
-        "R" => 1,
-        _ => 1,
-    };
-
-    let amount = num_str.parse::<i64>()?;
-    Ok((dir, amount))
-}
-
-fn turn_dial(dial: i64, spin: Spin) -> i64 {
-    (dial + spin.0 * spin.1).rem_euclid(DIAL_SIZE)
-}
-
-fn part1(spins: &[Spin]) -> i64 {
-    spins
-        .iter()
-        .scan(START_POS, |p, &s| {
-            *p = turn_dial(*p, s);
-            Some(*p)
-        })
-        .filter(|&p| p == 0)
-        .count() as i64
-}
-
-fn count_left_zeros(pos: i64, amt: i64) -> i64 {
-    let end_pos = pos - amt;
-    if end_pos > 0 {
-        return 0;
-    }
-    let t = if pos == 0 { 0 } else { 1 };
-
-    return t + (end_pos.abs() / DIAL_SIZE);
-}
-
-fn part2(spins: &[(i64, i64)]) -> i64 {
+fn solve(spins: &[i64]) -> (i64, i64) {
     let mut pos = START_POS;
-    let mut count = 0;
+    let mut stops_at_zero = 0;
+    let mut zero_passes = 0;
 
-    for &(dir, amt) in spins {
-        if dir > 0 {
-            count += (pos + amt) / DIAL_SIZE;
-            pos = (pos + amt) % DIAL_SIZE;
+    for &delta in spins {
+        if delta > 0 {
+            // Moving Right
+            zero_passes += (pos + delta) / DIAL_SIZE;
         } else {
-            count += count_left_zeros(pos, amt);
-            pos = (pos - amt).rem_euclid(DIAL_SIZE);
+            // Moving Left
+            let target = pos + delta;
+            if target <= 0 {
+                let cross = if pos == 0 { 0 } else { 1 };
+                zero_passes += cross + (target.abs() / DIAL_SIZE);
+            }
+        }
+
+        pos = (pos + delta).rem_euclid(DIAL_SIZE);
+        // Part 1
+        if pos == 0 {
+            stops_at_zero += 1;
         }
     }
-    count
+
+    (stops_at_zero, zero_passes)
 }
