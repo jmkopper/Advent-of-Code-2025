@@ -1,12 +1,9 @@
 use std::error::Error;
-use std::fs;
 
 const DIAL_SIZE: i64 = 100;
 const START_POS: i64 = 50;
 
-pub fn run() -> Result<(), Box<dyn Error>> {
-    let input = fs::read_to_string("puzzles/day01.txt")?;
-
+pub fn run(input: &str) -> Result<(), Box<dyn Error>> {
     // Parse "L50" to -50, "R20" to 20
     let spins: Vec<i64> = input
         .lines()

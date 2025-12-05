@@ -1,9 +1,7 @@
 use std::error::Error;
-use std::fs;
 
-pub fn run() -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string("puzzles/day03.txt")?;
-    let lines: Vec<&[u8]> = contents.trim().lines().map(str::as_bytes).collect();
+pub fn run(input: &str) -> Result<(), Box<dyn Error>> {
+    let lines: Vec<&[u8]> = input.trim().lines().map(str::as_bytes).collect();
     println!("Part 1: {}", solve(&lines, 2));
     println!("Part 2: {}", solve(&lines, 12));
 

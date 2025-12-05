@@ -1,10 +1,7 @@
 use std::error::Error;
-use std::fs;
 
-pub fn run() -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string("puzzles/day02.txt")?;
-
-    let ranges: Vec<(u64, u64)> = contents
+pub fn run(input: &str) -> Result<(), Box<dyn Error>> {
+    let ranges: Vec<(u64, u64)> = input
         .trim()
         .split(',')
         .map(|s| {
