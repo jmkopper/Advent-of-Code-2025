@@ -5,10 +5,11 @@ pub fn run(input: &str) -> Result<(), Box<dyn Error>> {
 
     let mut fresh_ranges = parse_ranges(first)?;
     fresh_ranges.sort_unstable(); // tuples are sorted by dictionary order
+    let collapsed = collapse(&fresh_ranges); // collapsing ranges also speeds up part 1
     let ingredient_ids: Vec<usize> = second.lines().map(str::parse).collect::<Result<_, _>>()?;
 
-    println!("Part 1: {}", part1(&fresh_ranges, &ingredient_ids));
-    println!("Part 2: {}", part2(&fresh_ranges));
+    println!("Part 1: {}", part1(&collapsed, &ingredient_ids));
+    println!("Part 2: {}", part2(&collapsed));
 
     Ok(())
 }
@@ -22,17 +23,6 @@ fn parse_ranges(s: &str) -> Result<Vec<(usize, usize)>, Box<dyn Error>> {
         ranges.push((left_int, right_int));
     }
     Ok(ranges)
-}
-
-fn part1(fresh_ranges: &[(usize, usize)], ingredients: &[usize]) -> usize {
-    ingredients
-        .iter()
-        .filter(|&&x| {
-            fresh_ranges
-                .iter()
-                .any(|&(left, right)| x >= left && x <= right)
-        })
-        .count()
 }
 
 fn collapse(ranges: &[(usize, usize)]) -> Vec<(usize, usize)> {
@@ -52,7 +42,17 @@ fn collapse(ranges: &[(usize, usize)]) -> Vec<(usize, usize)> {
     new_ranges
 }
 
+fn part1(fresh_ranges: &[(usize, usize)], ingredients: &[usize]) -> usize {
+    ingredients
+        .iter()
+        .filter(|&&x| {
+            fresh_ranges
+                .iter()
+                .any(|&(left, right)| x >= left && x <= right)
+        })
+        .count()
+}
+
 fn part2(fresh_ranges: &[(usize, usize)]) -> usize {
-    let new_ranges = collapse(&fresh_ranges);
-    new_ranges.iter().map(|(x, y)| 1 + y - x).sum()
+    fresh_ranges.iter().map(|(x, y)| 1 + y - x).sum()
 }
