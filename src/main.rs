@@ -1,5 +1,6 @@
 use std::error::Error;
 mod solutions;
+mod util;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let puzzles = vec![
@@ -9,6 +10,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         solutions::day04::run,
         solutions::day05::run,
         solutions::day06::run,
+        solutions::day07::run,
     ];
 
     for (i, puzzle) in puzzles.iter().enumerate() {
