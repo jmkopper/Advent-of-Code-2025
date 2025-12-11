@@ -47,8 +47,7 @@ impl UnionFind {
 
     fn find(&mut self, i: usize) -> usize {
         if self.parent[i] != i {
-            // flatten each subgraph
-            self.parent[i] = self.find(self.parent[i]);
+            return self.find(self.parent[i]);
         }
         self.parent[i]
     }

@@ -12,6 +12,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         solutions::day06::run,
         solutions::day07::run,
         solutions::day08::run,
+        solutions::day09::run,
+        solutions::day10::run,
+        solutions::day11::run,
     ];
 
     for (i, puzzle) in puzzles.iter().enumerate() {
